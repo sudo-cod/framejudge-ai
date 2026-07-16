@@ -102,6 +102,25 @@ DEEPSEEK_API_KEY="your-deepseek-api-key" DEEPSEEK_MODEL="deepseek-chat" uv run u
 
 Without an API key, FrameJudge can still analyze videos and will generate reports with its local template.
 
+## Docker and cloud runtime
+
+The repository includes a deployment-ready `Dockerfile`. The container listens on port `7860`:
+
+```bash
+docker build -t framejudge-ai .
+docker run --rm -p 7860:7860 framejudge-ai
+```
+
+Then open [http://127.0.0.1:7860](http://127.0.0.1:7860). To enable DeepSeek, pass the environment variable at startup:
+
+```bash
+docker run --rm -p 7860:7860 -e DEEPSEEK_API_KEY="your-deepseek-api-key" framejudge-ai
+```
+
+This container is compatible with Hugging Face Docker Spaces. Select **Docker** when creating the Space, keep the default application port `7860`, and add `DEEPSEEK_API_KEY` as an optional Secret.
+
+The container does not configure a persistent volume. Uploaded videos and analysis results exist only on the container's temporary disk and are cleared when the Space restarts, pauses, or redeploys. Files still need to be stored temporarily while analysis is running, so do not use a public demo for confidential material or long-term case archiving.
+
 ## Project layout
 
 ```text
@@ -114,6 +133,7 @@ app/
   models/          Bundled local MobileNetV2 ONNX model
 pyproject.toml     Python dependencies
 uv.lock            Reproducible dependency lockfile
+Dockerfile         Docker/Hugging Face Spaces runtime
 ```
 
 The `jobs/`, `threshold-settings.json`, `.env`, caches, and generated reports are local runtime data and are intentionally excluded from GitHub.
