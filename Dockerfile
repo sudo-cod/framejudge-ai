@@ -4,10 +4,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
+    IMAGEIO_FFMPEG_EXE=/usr/bin/ffmpeg \
     PATH="/home/user/app/.venv/bin:$PATH"
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
+        ffmpeg \
         fonts-noto-cjk \
         libglib2.0-0 \
         libgomp1 \
