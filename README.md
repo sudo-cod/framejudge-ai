@@ -1,49 +1,41 @@
-# FrameJudge AI / 帧证
+# 帧证 FrameJudge AI
 
-FrameJudge is a local AI-assisted video comparison and forensic reporting tool.
-It compares one original video with one or more suspected copies, evaluates
-visual and audio overlap, and produces an evidence-focused Chinese PDF report.
+简体中文 | [English](README.en.md)
 
-The application includes a FastAPI backend and a responsive browser interface.
-No separate frontend build step is required.
+FrameJudge 是一款在本地运行的 AI 辅助视频比对与技术取证工具。它可以将一个原始视频与一个或多个可疑视频进行比对，分析画面和音频重合情况，并生成以技术证据为重点的中文 PDF 报告。
 
-## Features
+项目包含 FastAPI 后端和响应式浏览器界面，无需单独构建前端。
 
-- One original video compared with multiple suspected videos in one case
-- Local MobileNetV2/ONNX fingerprint candidate retrieval
-- Strict frame, geometric, timeline, and audio verification
-- Picture-in-picture, subtitle, watermark, and occlusion evidence
-- Red, yellow, and gray risk classification
-- Configurable threshold presets with per-case configuration snapshots
-- Evidence screenshots, match timelines, audit details, and technical metrics
-- One consolidated PDF report per case
-- Local case history with rename, reopen, download, and delete actions
+## 功能
 
-## Privacy and data storage
+- 在一个案件中，用一个原始视频同时比对多个可疑视频
+- 使用本地 MobileNetV2/ONNX 模型检索候选相似帧
+- 严格验证画面、几何变换、时间轴和音频重合情况
+- 检测画中画、字幕、水印和遮挡证据
+- 按红色、黄色和灰色进行风险分级
+- 提供严格、标准、宽松及自定义阈值，并为每个案件保存配置快照
+- 展示证据截图、匹配时间轴、审计信息和技术指标
+- 为每个案件生成一份汇总 PDF 报告
+- 支持案件历史记录、重命名、重新打开、下载报告和删除案件
 
-Video analysis runs locally on the computer hosting FrameJudge. Video frames are
-not sent to a cloud AI service.
+## 隐私与数据存储
 
-FrameJudge stores uploaded videos, temporary frames, extracted audio, evidence,
-results, and reports under the generated `jobs/` directory. Delete a case from
-the interface when its files are no longer needed.
+视频分析在运行 FrameJudge 的本地电脑上完成，视频帧不会发送给云端 AI 服务。
 
-DeepSeek report writing is optional. When enabled, FrameJudge sends a compact
-text summary of the analysis results to DeepSeek; it does not send video frames.
-Without a DeepSeek API key, the application produces the PDF using its local
-report template.
+FrameJudge 会将上传的视频、临时帧、提取的音频、证据、分析结果和报告保存在自动生成的 `jobs/` 目录中。不再需要某个案件时，可在界面中删除它及其本地文件。
 
-## Requirements
+DeepSeek 报告润色功能是可选的。启用后，FrameJudge 只会向 DeepSeek 发送分析结果的精简文本摘要，不会发送视频或视频帧。未设置 DeepSeek API Key 时，系统会自动使用本地模板生成 PDF。
 
-- Windows 10/11 or a recent Linux distribution
-- Python 3.11 (the project currently requires `>=3.11,<3.12`)
+## 环境要求
+
+- Windows 10/11，或较新的 macOS/Linux 系统
+- Python 3.11（当前要求 `>=3.11,<3.12`）
 - [`uv`](https://docs.astral.sh/uv/getting-started/installation/)
-- Sufficient free disk space for the uploaded videos and temporary analysis files
+- 足够存放上传视频和临时分析文件的磁盘空间
 
-The required MobileNetV2 ONNX model is included in the repository. FFmpeg is
-provided through the `imageio-ffmpeg` dependency.
+项目已包含所需的 MobileNetV2 ONNX 模型。FFmpeg 由 `imageio-ffmpeg` 依赖提供。
 
-## Install and run
+## 安装并运行
 
 ### Windows PowerShell
 
@@ -55,7 +47,7 @@ uv sync --locked
 uv run uvicorn app.main:app --host 127.0.0.1 --port 8001
 ```
 
-### macOS or Linux
+### macOS 或 Linux（Bash）
 
 ```bash
 git clone https://github.com/sudo-cod/framejudge-ai.git
@@ -65,95 +57,84 @@ uv sync --locked
 uv run uvicorn app.main:app --host 127.0.0.1 --port 8001
 ```
 
-Open [http://127.0.0.1:8001](http://127.0.0.1:8001) in a browser.
+然后在浏览器中打开 [http://127.0.0.1:8001](http://127.0.0.1:8001)。
 
-The first `uv sync` can take several minutes because it installs the video,
-audio, OCR, and ONNX dependencies. Later starts only require the final
-`uv run uvicorn ...` command.
+第一次执行 `uv sync` 可能需要几分钟，因为需要安装视频、音频、OCR 和 ONNX 相关依赖。之后再次启动时，只需执行最后一条 `uv run uvicorn ...` 命令。
 
-Press `Ctrl+C` in the terminal to stop the application.
+在终端中按 `Ctrl+C` 可停止应用。
 
-## How to use
+## 使用方法
 
-1. Open **阈值设置** if you want to choose a strict, standard, loose, or custom
-   threshold profile. New settings only apply to cases created afterward.
-2. Return to **案件库** and select **新建案件**.
-3. Optionally enter a case name.
-4. Select exactly one original video.
-5. Select one or more suspected videos.
-6. Select **开始分析** and wait for all seven analysis stages to finish.
-7. Open the case to review the risk overview and select an individual video for
-   evidence, timeline, audit, and technical details.
-8. Use **下载 PDF 报告** to save the consolidated report.
+1. 如需调整判定标准，先打开“阈值设置”，选择严格、标准、宽松或自定义配置。新设置只会应用于之后创建的案件。
+2. 返回“案件库”，选择“新建案件”。
+3. 根据需要填写案件名称。
+4. 选择一个原始视频。
+5. 选择一个或多个可疑视频。
+6. 点击“开始分析”，等待全部七个分析阶段完成。
+7. 打开案件查看风险总览，并选择单个视频查看证据、时间轴、审计信息和技术详情。
+8. 点击“下载 PDF 报告”保存案件汇总报告。
 
-Analysis time depends heavily on video duration, resolution, and CPU speed.
-Large cases can take a long time. Do not stop the server while a case is being
-processed.
+分析时间主要取决于视频时长、分辨率和 CPU 性能。大型案件可能需要较长时间，请勿在案件处理过程中停止服务器。
 
-## Optional DeepSeek reports
+## 可选：使用 DeepSeek 生成报告文本
 
-Copy the environment template:
+无需创建或编辑 `.env` 文件。直接在启动命令中设置 API Key 即可。
 
-```powershell
-Copy-Item .env.example .env
-```
-
-On macOS or Linux:
+### macOS 或 Linux（Bash）
 
 ```bash
-cp .env.example .env
+DEEPSEEK_API_KEY="你的-DeepSeek-API-Key" uv run uvicorn app.main:app --host 127.0.0.1 --port 8001
 ```
 
-Then edit `.env`:
+### Windows PowerShell
 
-```env
-DEEPSEEK_API_KEY=your-real-api-key
-DEEPSEEK_MODEL=deepseek-chat
+```powershell
+$env:DEEPSEEK_API_KEY="你的-DeepSeek-API-Key"; uv run uvicorn app.main:app --host 127.0.0.1 --port 8001
 ```
 
-Restart FrameJudge after changing `.env`. Never commit or share the `.env` file.
+Bash 内联变量只对本次启动的进程有效；PowerShell 变量会保留到当前终端关闭。两种方式都不会把密钥写入项目文件。不要将真实 API Key 提交到 GitHub，也不要在截图或日志中公开它。
 
-## Project layout
+`DEEPSEEK_MODEL` 为可选环境变量，默认值为 `deepseek-chat`。例如：
+
+```bash
+DEEPSEEK_API_KEY="你的-DeepSeek-API-Key" DEEPSEEK_MODEL="deepseek-chat" uv run uvicorn app.main:app --host 127.0.0.1 --port 8001
+```
+
+未设置 API Key 时，FrameJudge 仍然可以正常分析视频，并使用本地模板生成报告。
+
+## 项目结构
 
 ```text
 app/
-  main.py          FastAPI routes, uploads, cases, and job progress
-  pipeline.py      Video analysis orchestration
-  scoring.py       Thresholds and risk classification
-  pdf_report.py    Consolidated PDF generation
-  static/          Browser interface
-  models/          Bundled local MobileNetV2 ONNX model
-pyproject.toml     Python dependencies
-uv.lock            Reproducible dependency lockfile
+  main.py          FastAPI 路由、视频上传、案件和任务进度
+  pipeline.py      视频分析流程编排
+  scoring.py       阈值和风险分级
+  pdf_report.py    案件汇总 PDF 生成
+  static/          浏览器界面
+  models/          内置 MobileNetV2 ONNX 模型
+pyproject.toml     Python 依赖配置
+uv.lock            可复现的依赖锁定文件
 ```
 
-The `jobs/`, `threshold-settings.json`, `.env`, caches, and generated reports are
-local runtime data and are intentionally excluded from GitHub.
+`jobs/`、`threshold-settings.json`、`.env`、缓存和生成的报告都是本地运行数据，不会提交到 GitHub。
 
-## Local network access
+## 局域网访问
 
-For trusted devices on the same private network, start with:
+如需让同一可信局域网内的设备访问，请使用：
 
 ```powershell
 uv run uvicorn app.main:app --host 0.0.0.0 --port 8001
 ```
 
-Then open `http://<computer-ip>:8001` from another device. FrameJudge currently
-has no user authentication, so do not expose this port directly to the public
-internet.
+然后在其他设备上打开 `http://<运行电脑的IP地址>:8001`。FrameJudge 当前没有用户认证功能，请勿将此端口直接暴露到公网。
 
-## Troubleshooting
+## 常见问题
 
-- If `uv` is not recognized immediately after installation, close and reopen the
-  terminal.
-- If port 8001 is busy, choose another port, for example `--port 8011`.
-- If a running analysis is interrupted by a server restart, create a new case and
-  run the analysis again.
-- If DeepSeek is unavailable or not configured, PDF generation automatically
-  falls back to the local template.
+- 如果安装后终端无法识别 `uv`，请关闭并重新打开终端。
+- 如果 8001 端口已被占用，可改用其他端口，例如 `--port 8011`。
+- 如果分析过程中服务器被关闭，请重新创建案件并再次运行分析。
+- 如果 DeepSeek 不可用或未配置，PDF 会自动使用本地模板生成。
 
-## Disclaimer
+## 免责声明
 
-FrameJudge presents objective technical comparison results for review. It does
-not provide legal advice and does not determine whether copyright infringement
-has occurred.
+FrameJudge 仅展示客观技术比对结果，供人工复核参考。它不提供法律意见，也不判断是否构成著作权侵权。
