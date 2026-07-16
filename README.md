@@ -102,6 +102,25 @@ DEEPSEEK_API_KEY="你的-DeepSeek-API-Key" DEEPSEEK_MODEL="deepseek-chat" uv run
 
 未设置 API Key 时，FrameJudge 仍然可以正常分析视频，并使用本地模板生成报告。
 
+## Docker 与云端运行
+
+仓库包含可直接部署的 `Dockerfile`。容器监听 `7860` 端口：
+
+```bash
+docker build -t framejudge-ai .
+docker run --rm -p 7860:7860 framejudge-ai
+```
+
+然后打开 [http://127.0.0.1:7860](http://127.0.0.1:7860)。如需启用 DeepSeek，可在启动时传入环境变量：
+
+```bash
+docker run --rm -p 7860:7860 -e DEEPSEEK_API_KEY="你的-DeepSeek-API-Key" framejudge-ai
+```
+
+该容器适用于 Hugging Face Docker Spaces。创建 Space 时选择 **Docker**，使用默认应用端口 `7860`，并将 `DEEPSEEK_API_KEY` 作为可选的 Secret 添加。
+
+容器没有配置持久卷。上传视频和分析结果只会暂存在容器磁盘中，并会在 Space 重启、暂停或重新部署时清空。分析期间仍需临时保存视频文件，请勿将公开演示站用于机密材料或长期案件存档。
+
 ## 项目结构
 
 ```text
@@ -114,6 +133,7 @@ app/
   models/          内置 MobileNetV2 ONNX 模型
 pyproject.toml     Python 依赖配置
 uv.lock            可复现的依赖锁定文件
+Dockerfile         Docker/Hugging Face Spaces 运行环境
 ```
 
 `jobs/`、`threshold-settings.json`、`.env`、缓存和生成的报告都是本地运行数据，不会提交到 GitHub。
