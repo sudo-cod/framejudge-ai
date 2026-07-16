@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>帧证 FrameJudge AI</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script defer src="/app.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">帧</div>
+        <div>
+          <div class="brand-name">帧证</div>
+          <div class="brand-en">FRAMEJUDGE AI</div>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="主导航">
+        <button class="nav-item is-active" id="nav-library" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="5" rx="1"/><rect x="3" y="12" width="18" height="8" rx="1"/></svg>
+          <span>案件库</span>
+        </button>
+        <button class="nav-item" id="nav-settings" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M4.9 4.9 7 7m10 10 2.1 2.1M2 12h3m14 0h3M4.9 19.1 7 17m10-10 2.1-2.1"/></svg>
+          <span>阈值设置</span>
+        </button>
+      </nav>
+
+      <div class="legal-note">本系统仅呈现客观技术比对结果，不构成法律意见或侵权定性。</div>
+    </aside>
+
+    <header class="mobile-header">
+      <button class="mobile-brand" id="mobile-library" type="button"><span>帧</span> 帧证</button>
+      <button class="mobile-settings" id="mobile-settings" type="button">阈值设置</button>
+    </header>
+
+    <main class="main" id="main-content">
+      <section class="screen is-active" id="screen-library" aria-labelledby="library-title">
+        <div class="page wide-page">
+          <div class="page-heading heading-actions">
+            <div>
+              <h1 id="library-title">案件库</h1>
+              <p>管理视频版权比对案件。每个案件包含一个原始视频与一个或多个可疑视频。</p>
+            </div>
+            <button class="btn btn-primary" id="new-case" type="button">
+              <span class="btn-icon" aria-hidden="true">＋</span>新建案件
+            </button>
+          </div>
+
+          <div class="notice notice-error is-hidden" id="library-error"></div>
+          <div class="loading-card" id="library-loading"><span class="spinner"></span>正在读取案件…</div>
+          <div class="case-list is-hidden" id="case-list"></div>
+          <div class="empty-state is-hidden" id="case-empty">
+            <div class="empty-icon" aria-hidden="true">▤</div>
+            <h2>还没有任何案件</h2>
+            <p>创建第一个案件，上传一个原始视频与若干可疑视频，系统将逐个完成技术比对。</p>
+            <button class="btn btn-primary" id="empty-new-case" type="button">＋ 新建案件</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-create" aria-labelledby="create-title">
+        <div class="page narrow-page">
+          <button class="back-button" data-go="library" type="button">← 返回案件库</button>
+          <div class="page-heading">
+            <h1 id="create-title">新建案件</h1>
+            <p>上传一个原始视频与一个或多个可疑视频。系统将按当前全局阈值配置逐个比对。</p>
+          </div>
+
+          <form class="card form-card" id="create-form">
+            <label class="field-label" for="case-name">案件名称 <span>（可选）</span></label>
+            <input class="text-input" id="case-name" maxlength="100" placeholder="输入案件名称（可选）">
+
+            <div class="section-divider"></div>
+            <div class="field-heading"><strong>原始视频</strong><span class="chip chip-blue">仅限 1 个</span></div>
+            <div class="file-selection original-selection is-hidden" id="original-selection"></div>
+            <button class="drop-zone" id="original-drop" type="button">
+              <span class="upload-icon" aria-hidden="true">⇧</span>
+              <strong>拖拽或点击选择原始视频</strong>
+            </button>
+            <input id="original-input" type="file" accept="video/*,.mp4,.mov,.mkv,.avi,.webm,.m4v" hidden>
+
+            <div class="field-heading suspects-heading">
+              <div><strong>可疑视频</strong><span class="chip chip-yellow">1 个或多个</span></div>
+              <span>已选 <b id="suspect-count">0</b> 个</span>
+            </div>
+            <div class="selected-files" id="suspect-files"></div>
+            <button class="drop-zone compact" id="suspect-drop" type="button">＋ 拖拽或点击添加可疑视频</button>
+            <input id="suspect-input" type="file" accept="video/*,.mp4,.mov,.mkv,.avi,.webm,.m4v" multiple hidden>
+
+            <div class="notice notice-error is-hidden" id="create-error"></div>
+            <div class="section-divider"></div>
+
+            <div class="snapshot-heading">
+              <div><strong>当前阈值配置</strong><p>创建案件时会保存配置快照；之后修改全局设置不会改变本案结果。</p></div>
+              <button class="text-button" id="create-open-settings" type="button">前往设置</button>
+            </div>
+            <div class="settings-snapshot" id="create-settings-snapshot">
+              <div class="skeleton-line"></div><div class="skeleton-line"></div>
+            </div>
+
+            <div class="form-submit-row">
+              <p>后端不提供上传百分比。大文件提交期间请勿关闭页面。</p>
+              <button class="btn btn-primary btn-large" id="submit-case" type="submit" disabled>开始分析</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-progress" aria-labelledby="progress-title">
+        <div class="page narrow-page">
+          <button class="back-button" data-go="library" type="button">← 返回案件库</button>
+          <div class="case-title-row"><h1 id="progress-title">案件分析</h1><code id="progress-case-id"></code></div>
+          <div id="progress-content"></div>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-overview" aria-labelledby="overview-title">
+        <div class="page wide-page">
+          <button class="back-button" data-go="library" type="button">← 返回案件库</button>
+          <div id="overview-content"></div>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-detail" aria-labelledby="detail-title">
+        <div class="page detail-page">
+          <button class="back-button" id="back-overview" type="button">← 返回案件总览</button>
+          <div id="detail-content"></div>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-settings" aria-labelledby="settings-title">
+        <div class="page narrow-page">
+          <div class="page-heading">
+            <h1 id="settings-title">阈值设置</h1>
+            <p>配置为全局设置，用于之后创建案件的风险判定。</p>
+          </div>
+          <div class="notice notice-warning"><strong>新配置仅适用于之后创建的案件，不会改变已有案件的结果。</strong><br>已有案件保留其分析时使用的阈值快照。</div>
+          <div class="card settings-card">
+            <h2>阈值预设</h2>
+            <div class="preset-grid" id="preset-grid"></div>
+            <div class="section-divider"></div>
+            <div class="settings-field-heading"><h2>可编辑阈值</h2><span id="settings-lock-note"></span></div>
+            <div class="settings-fields" id="settings-fields"></div>
+            <div class="settings-footer">
+              <span id="settings-revision"></span>
+              <button class="btn btn-primary" id="save-settings" type="button">保存配置</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-layer is-hidden" id="modal-layer" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal" id="modal-content"></div>
+  </div>
+  <div class="toast is-hidden" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
